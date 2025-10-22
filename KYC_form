@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure KYC Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #ff6600;
+            --accent: #b21f1f;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: rgba(26, 42, 108, 0.9);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--secondary);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a.active {
+            color: var(--secondary);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .user-menu i {
+            font-size: 1.2rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px auto;
+            position: relative;
+            max-width: 600px;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #e9ecef;
+            z-index: 1;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background-color: var(--secondary);
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .progress-bar.step-2::after {
+            width: 100%;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .step-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-icon {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .step.completed .step-icon {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 14px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .step.active .step-label {
+            color: var(--secondary);
+        }
+
+        .step.completed .step-label {
+            color: var(--success);
+        }
+
+        /* Main Content */
+        main {
+            padding: 20px 0 40px;
+            flex: 1;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .page-title h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-title {
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-title i {
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.2);
+            outline: none;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .phone-prefix {
+            flex: 0 0 100px;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-container input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            color: #495057;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .file-input-button:hover {
+            background: #e9ecef;
+            border-color: var(--secondary);
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .file-requirements {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .validation-message {
+            font-size: 14px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .valid {
+            color: var(--success);
+        }
+
+        .invalid {
+            color: var(--danger);
+        }
+
+        /* Image Capture Options */
+        .image-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .image-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .image-option:hover {
+            border-color: var(--secondary);
+            background-color: #f8f9fa;
+        }
+
+        .image-option.active {
+            border-color: var(--secondary);
+            background-color: rgba(255, 102, 0, 0.05);
+        }
+
+        .option-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+
+        .image-option.active .option-icon {
+            color: var(--secondary);
+        }
+
+        .option-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .image-option.active .option-label {
+            color: var(--secondary);
+        }
+
+        /* Selfie Container */
+        .selfie-container {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .selfie-container.active {
+            display: block;
+        }
+
+        .camera-preview {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background-color: #f8f9fa;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .camera-preview video, .camera-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-placeholder {
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .camera-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        /* Upload Container */
+        .upload-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .upload-container.active {
+            display: block;
+        }
+
+        .upload-preview {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background-color: #f8f9fa;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .upload-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-placeholder {
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .upload-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e65c00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        /* Terms & Conditions Section */
+        .terms-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+        }
+
+        .terms-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .terms-content {
+            line-height: 1.8;
+        }
+
+        .terms-content h3 {
+            margin: 20px 0 10px;
+            color: var(--primary);
+        }
+
+        .terms-content p {
+            margin-bottom: 15px;
+        }
+
+        .terms-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .terms-content li {
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 3px;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: rgba(26, 42, 108, 0.9);
+            color: white;
+            padding: 30px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ddd;
+            font-size: 14px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .camera-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .camera-controls .btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+            
+            .progress-bar {
+                max-width: 100%;
+            }
+            
+            .step-label {
+                font-size: 12px;
+            }
+            
+            .image-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>SecureKYC</h1>
+                </div>
+                <nav class="nav-links">
+                    <a href="#" class="active">KYC Verification</a>
+                    <a href="#">Dashboard</a>
+                    <a href="#">Transactions</a>
+                    <a href="#">Support</a>
+                </nav>
+                <div class="user-menu">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Welcome, User</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="page-title">
+                <h2>Identity Verification</h2>
+                <p>Complete your KYC verification to access all features</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar step-1" id="progressBar">
+                <div class="step active" id="step1">
+                    <div class="step-icon">1</div>
+                    <div class="step-label">Personal Information</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-icon">2</div>
+                    <div class="step-label">Terms & Agreement</div>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <!-- Step 1: Personal Information -->
+                <div class="form-section active" id="section1">
+                    <h2 class="form-title"><i class="fas fa-user-check"></i> Personal Information</h2>
+                    
+                    <form id="kycForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName" class="required">First Name</label>
+                                <input type="text" id="firstName" placeholder="Enter your first name" required>
+                                <div id="firstNameValidation" class="validation-message"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName" class="required">Last Name</label>
+                                <input type="text" id="lastName" placeholder="Enter your last name" required>
+                                <div id="lastNameValidation" class="validation-message"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="required">Email Address</label>
+                            <input type="email" id="email" placeholder="Enter your email address" required>
+                            <div id="emailValidation" class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="required">Phone Number</label>
+                            <div class="phone-input">
+                                <div class="phone-prefix">
+                                    <select id="phonePrefix">
+                                        <option value="+27">+27 (ZA)</option>
+                                        <option value="+1">+1 (US)</option>
+                                        <option value="+44">+44 (UK)</option>
+                                        <option value="+61">+61 (AU)</option>
+                                        <option value="+91">+91 (IN)</option>
+                                    </select>
+                                </div>
+                                <div class="phone-number">
+                                    <input type="tel" id="phoneNumber" placeholder="Enter your phone number" required>
+                                </div>
+                            </div>
+                            <div id="phoneValidation" class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idType" class="required">Identity Document Type</label>
+                            <select id="idType" required>
+                                <option value="">Select document type</option>
+                                <option value="id_card">Identity Document Card</option>
+                                <option value="id_book">Identity Document Book</option>
+                                <option value="passport">Passport</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idNumber" class="required">ID Document Number</label>
+                            <input type="text" id="idNumber" placeholder="Enter your document number" required>
+                            <div id="idValidation" class="validation-message"></div>
+                        </div>
+                        
+                        <div id="documentUploadSection">
+                            <!-- Dynamic document upload fields will be inserted here -->
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="addressProof" class="required">Proof of Address</label>
+                            <div class="file-input-container">
+                                <div class="file-input-button">
+                                    <i class="fas fa-upload"></i> Upload Proof of Address
+                                </div>
+                                <input type="file" id="addressProof" accept=".tiff,.png,.pdf,.jpg,.jpeg" required>
+                            </div>
+                            <div id="addressProofFileName" class="file-name"></div>
+                            <div class="file-requirements">Accepted formats: TIFF, PNG, PDF, JPG (Max size: 5MB)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="selfiePhoto" class="required">Selfie with ID Document</label>
+                            
+                            <!-- Image Capture Options -->
+                            <div class="image-options">
+                                <div class="image-option active" id="selfieOption">
+                                    <div class="option-icon">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="option-label">Take Selfie</div>
+                                </div>
+                                <div class="image-option" id="uploadOption">
+                                    <div class="option-icon">
+                                        <i class="fas fa-upload"></i>
+                                    </div>
+                                    <div class="option-label">Upload Photo</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selfie Container -->
+                            <div class="selfie-container active" id="selfieContainer">
+                                <div class="camera-preview" id="cameraPreview">
+                                    <div class="camera-placeholder">
+                                        <i class="fas fa-camera"></i>
+                                        <p>Camera preview will appear here</p>
+                                    </div>
+                                </div>
+                                <div class="camera-controls">
+                                    <button type="button" class="btn btn-primary" id="takeSelfieBtn">
+                                        <i class="fas fa-camera"></i> Take Selfie
+                                    </button>
+                                    <button type="button" class="btn btn-success" id="captureBtn" style="display: none;">
+                                        <i class="fas fa-camera-retro"></i> Capture
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="retakeBtn" style="display: none;">
+                                        <i class="fas fa-redo"></i> Retake
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Container -->
+                            <div class="upload-container" id="uploadContainer">
+                                <div class="upload-preview" id="uploadPreview">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Uploaded image will appear here</p>
+                                    </div>
+                                </div>
+                                <div class="file-input-container">
+                                    <div class="file-input-button">
+                                        <i class="fas fa-upload"></i> Choose Selfie Image
+                                    </div>
+                                    <input type="file" id="selfieUpload" accept="image/*">
+                                </div>
+                                <div id="selfieUploadFileName" class="file-name"></div>
+                                <div class="file-requirements">Accepted formats: JPG, PNG (Max size: 5MB)</div>
+                            </div>
+                            
+                            <div id="selfieStatus" class="validation-message"></div>
+                        </div>
+                        
+                        <div id="nameMatch" class="validation-message"></div>
+                        
+                        <div class="form-buttons">
+                            <div></div> <!-- Empty div for spacing -->
+                            <button type="button" class="btn btn-primary" id="nextBtn">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Step 2: Terms and Agreement -->
+                <div class="form-section" id="section2">
+                    <h2 class="form-title"><i class="fas fa-file-contract"></i> Terms & Agreement</h2>
+                    
+                    <div class="terms-container">
+                        <h2 class="terms-title">KYC Verification Agreement</h2>
+                        <div class="terms-content">
+                            <p>By proceeding with this verification, you agree to the following terms and conditions:</p>
+                            
+                            <h3>1. Data Collection and Usage</h3>
+                            <p>We collect your personal information including name, contact details, and identification documents for the purpose of identity verification as required by financial regulations.</p>
+                            
+                            <h3>2. Consent to Verification</h3>
+                            <p>You consent to us verifying the information provided against official databases and third-party verification services to confirm your identity.</p>
+                            
+                            <h3>3. Data Storage and Protection</h3>
+                            <p>Your data will be stored securely in accordance with data protection laws. We implement industry-standard security measures to protect your information from unauthorized access.</p>
+                            
+                            <h3>4. Information Sharing</h3>
+                            <p>We may share your information with regulatory authorities as required by law. We do not sell your personal information to third parties.</p>
+                            
+                            <h3>5. Document Retention</h3>
+                            <p>Your identification documents will be retained for as long as necessary to comply with legal obligations and for fraud prevention purposes.</p>
+                            
+                            <h3>6. Your Rights</h3>
+                            <p>You have the right to access, correct, or delete your personal information, subject to legal limitations. Contact our support team to exercise these rights.</p>
+                            
+                            <h3>7. Liability</h3>
+                            <p>We are not liable for any losses resulting from inaccurate information provided by you during the verification process.</p>
+                            
+                            <h3>8. Communication</h3>
+                            <p>You agree to receive communications related to your account and verification status via email and SMS.</p>
+                            
+                            <p><strong>By checking the box below, you acknowledge that you have read, understood, and agree to these terms and conditions.</strong></p>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms" class="required">I have read and agree to the Terms and Conditions</label>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-secondary" id="backBtn">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn" form="kycForm" disabled>
+                            <i class="fas fa-lock"></i> Submit KYC
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SecureKYC</h3>
+                    <p>Advanced identity verification solutions for secure digital transactions.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">KYC Verification</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-envelope"></i> support@securekyc.com</li>
+                        <li><i class="fas fa-phone"></i> +27 11 123 4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Johannesburg, South Africa</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 SecureKYC Verification. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const kycForm = document.getElementById('kycForm');
+            const section1 = document.getElementById('section1');
+            const section2 = document.getElementById('section2');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const progressBar = document.getElementById('progressBar');
+            const nextBtn = document.getElementById('nextBtn');
+            const backBtn = document.getElementById('backBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const agreeTerms = document.getElementById('agreeTerms');
+            
+            // Image capture elements
+            const selfieOption = document.getElementById('selfieOption');
+            const uploadOption = document.getElementById('uploadOption');
+            const selfieContainer = document.getElementById('selfieContainer');
+            const uploadContainer = document.getElementById('uploadContainer');
+            const takeSelfieBtn = document.getElementById('takeSelfieBtn');
+            const captureBtn = document.getElementById('captureBtn');
+            const retakeBtn = document.getElementById('retakeBtn');
+            const cameraPreview = document.getElementById('cameraPreview');
+            const selfieUpload = document.getElementById('selfieUpload');
+            const uploadPreview = document.getElementById('uploadPreview');
+            const selfieUploadFileName = document.getElementById('selfieUploadFileName');
+            const selfieStatus = document.getElementById('selfieStatus');
+            
+            const documentUploadSection = document.getElementById('documentUploadSection');
+            const idTypeSelect = document.getElementById('idType');
+            const addressProofInput = document.getElementById('addressProof');
+            const addressProofFileName = document.getElementById('addressProofFileName');
+            
+            // Form fields
+            const firstNameInput = document.getElementById('firstName');
+            const lastNameInput = document.getElementById('lastName');
+            const emailInput = document.getElementById('email');
+            const idNumberInput = document.getElementById('idNumber');
+            
+            // Validation elements
+            const firstNameValidation = document.getElementById('firstNameValidation');
+            const lastNameValidation = document.getElementById('lastNameValidation');
+            const emailValidation = document.getElementById('emailValidation');
+            const idValidation = document.getElementById('idValidation');
+            const nameMatch = document.getElementById('nameMatch');
+            
+            // Camera variables
+            let stream = null;
+            let capturedImage = null;
+            let uploadedImage = null;
+            let currentImageMode = 'selfie'; // 'selfie' or 'upload'
+
+            // Image option selection
+            selfieOption.addEventListener('click', function() {
+                selfieOption.classList.add('active');
+                uploadOption.classList.remove('active');
+                selfieContainer.classList.add('active');
+                uploadContainer.classList.remove('active');
+                currentImageMode = 'selfie';
+                updateSelfieStatus();
+            });
+
+            uploadOption.addEventListener('click', function() {
+                uploadOption.classList.add('active');
+                selfieOption.classList.remove('active');
+                uploadContainer.classList.add('active');
+                selfieContainer.classList.remove('active');
+                currentImageMode = 'upload';
+                updateSelfieStatus();
+            });
+
+            // Document type change handler
+            idTypeSelect.addEventListener('change', function() {
+                updateDocumentUploadFields(this.value);
+            });
+            
+            // Update document upload fields based on document type
+            function updateDocumentUploadFields(documentType) {
+                let html = '';
+                
+                if (documentType === 'id_card') {
+                    html = `
+                        <div class="form-group">
+                            <label for="idDocument" class="required">ID Card Image</label>
+                            <div class="file-input-container">
+                                <div class="file-input-button">
+                                    <i class="fas fa-upload"></i> Upload ID Card
+                                </div>
+                                <input type="file" id="idDocument" accept="image/*,.pdf" required>
+                            </div>
+                            <div id="idFileName" class="file-name"></div>
+                            <div class="file-requirements">Upload a clear image of your ID Card (front and back in one file)</div>
+                        </div>
+                    `;
+                } else if (documentType === 'id_book' || documentType === 'passport') {
+                    const docName = documentType === 'id_book' ? 'ID Book' : 'Passport';
+                    html = `
+                        <div class="form-group">
+                            <label for="idDocumentFront" class="required">${docName} Front Cover</label>
+                            <div class="file-input-container">
+                                <div class="file-input-button">
+                                    <i class="fas fa-upload"></i> Upload ${docName} Front
+                                </div>
+                                <input type="file" id="idDocumentFront" accept="image/*,.pdf" required>
+                            </div>
+                            <div id="idFrontFileName" class="file-name"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="idDocumentBack" class="required">${docName} Back Cover</label>
+                            <div class="file-input-container">
+                                <div class="file-input-button">
+                                    <i class="fas fa-upload"></i> Upload ${docName} Back
+                                </div>
+                                <input type="file" id="idDocumentBack" accept="image/*,.pdf" required>
+                            </div>
+                            <div id="idBackFileName" class="file-name"></div>
+                        </div>
+                    `;
+                }
+                
+                documentUploadSection.innerHTML = html;
+                
+                // Add event listeners for new file inputs
+                if (documentType === 'id_card') {
+                    const idDocumentInput = document.getElementById('idDocument');
+                    const idFileName = document.getElementById('idFileName');
+                    
+                    if (idDocumentInput) {
+                        idDocumentInput.addEventListener('change', function() {
+                            if (this.files.length > 0) {
+                                idFileName.textContent = `Selected: ${this.files[0].name}`;
+                            } else {
+                                idFileName.textContent = '';
+                            }
+                        });
+                    }
+                } else if (documentType === 'id_book' || documentType === 'passport') {
+                    const idDocumentFrontInput = document.getElementById('idDocumentFront');
+                    const idFrontFileName = document.getElementById('idFrontFileName');
+                    const idDocumentBackInput = document.getElementById('idDocumentBack');
+                    const idBackFileName = document.getElementById('idBackFileName');
+                    
+                    if (idDocumentFrontInput) {
+                        idDocumentFrontInput.addEventListener('change', function() {
+                            if (this.files.length > 0) {
+                                idFrontFileName.textContent = `Selected: ${this.files[0].name}`;
+                            } else {
+                                idFrontFileName.textContent = '';
+                            }
+                        });
+                    }
+                    
+                    if (idDocumentBackInput) {
+                        idDocumentBackInput.addEventListener('change', function() {
+                            if (this.files.length > 0) {
+                                idBackFileName.textContent = `Selected: ${this.files[0].name}`;
+                            } else {
+                                idBackFileName.textContent = '';
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Initialize with ID Card as default
+            updateDocumentUploadFields('id_card');
+            
+            // File input handlers
+            addressProofInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    addressProofFileName.textContent = `Selected: ${this.files[0].name}`;
+                } else {
+                    addressProofFileName.textContent = '';
+                }
+            });
+            
+            selfieUpload.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    selfieUploadFileName.textContent = `Selected: ${file.name}`;
+                    
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadPreview.innerHTML = `<img src="${e.target.result}" alt="Uploaded selfie">`;
+                        uploadedImage = e.target.result;
+                        updateSelfieStatus();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    selfieUploadFileName.textContent = '';
+                    uploadPreview.innerHTML = `
+                        <div class="upload-placeholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Uploaded image will appear here</p>
+                        </div>
+                    `;
+                    uploadedImage = null;
+                    updateSelfieStatus();
+                }
+            });
+            
+            // Take Selfie Button Handler
+            takeSelfieBtn.addEventListener('click', function() {
+                startCamera();
+            });
+            
+            // Capture Button Handler
+            captureBtn.addEventListener('click', function() {
+                captureImage();
+            });
+            
+            // Retake Button Handler
+            retakeBtn.addEventListener('click', function() {
+                retakeImage();
+            });
+            
+            // Start camera function
+            function startCamera() {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+                        .then(function(mediaStream) {
+                            stream = mediaStream;
+                            cameraPreview.innerHTML = '<video autoplay playsinline></video>';
+                            const video = cameraPreview.querySelector('video');
+                            video.srcObject = stream;
+                            
+                            // Show capture button and hide take selfie button
+                            takeSelfieBtn.style.display = 'none';
+                            captureBtn.style.display = 'flex';
+                            retakeBtn.style.display = 'none';
+                            
+                            selfieStatus.innerHTML = '<i class="fas fa-info-circle"></i> Camera active - position your face in the frame';
+                            selfieStatus.className = 'validation-message valid';
+                        })
+                        .catch(function(error) {
+                            console.error('Error accessing camera:', error);
+                            selfieStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Could not access camera. Please check permissions.';
+                            selfieStatus.className = 'validation-message invalid';
+                        });
+                } else {
+                    selfieStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Camera not supported on this device';
+                    selfieStatus.className = 'validation-message invalid';
+                }
+            }
+            
+            // Capture image function
+            function captureImage() {
+                if (stream) {
+                    const video = cameraPreview.querySelector('video');
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    capturedImage = canvas.toDataURL('image/png');
+                    
+                    // Stop the camera stream
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // Show captured image
+                    cameraPreview.innerHTML = `<img src="${capturedImage}" alt="Captured selfie">`;
+                    
+                    // Show retake button and hide capture button
+                    captureBtn.style.display = 'none';
+                    retakeBtn.style.display = 'flex';
+                    
+                    selfieStatus.innerHTML = '<i class="fas fa-check-circle"></i> Selfie captured successfully';
+                    selfieStatus.className = 'validation-message valid';
+                }
+            }
+            
+            // Retake image function
+            function retakeImage() {
+                capturedImage = null;
+                cameraPreview.innerHTML = `
+                    <div class="camera-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Camera preview will appear here</p>
+                    </div>
+                `;
+                
+                // Show take selfie button and hide retake button
+                takeSelfieBtn.style.display = 'flex';
+                retakeBtn.style.display = 'none';
+                
+                updateSelfieStatus();
+            }
+            
+            // Update selfie status based on current mode and image availability
+            function updateSelfieStatus() {
+                if (currentImageMode === 'selfie') {
+                    if (capturedImage) {
+                        selfieStatus.innerHTML = '<i class="fas fa-check-circle"></i> Selfie captured successfully';
+                        selfieStatus.className = 'validation-message valid';
+                    } else {
+                        selfieStatus.innerHTML = '<i class="fas fa-info-circle"></i> Click "Take Selfie" to capture your photo';
+                        selfieStatus.className = 'validation-message';
+                    }
+                } else {
+                    if (uploadedImage) {
+                        selfieStatus.innerHTML = '<i class="fas fa-check-circle"></i> Selfie uploaded successfully';
+                        selfieStatus.className = 'validation-message valid';
+                    } else {
+                        selfieStatus.innerHTML = '<i class="fas fa-info-circle"></i> Upload a selfie image';
+                        selfieStatus.className = 'validation-message';
+                    }
+                }
+            }
+            
+            // Next button handler
+            nextBtn.addEventListener('click', function() {
+                // Validate step 1 before proceeding
+                if (validateStep1()) {
+                    section1.classList.remove('active');
+                    section2.classList.add('active');
+                    step1.classList.remove('active');
+                    step1.classList.add('completed');
+                    step2.classList.add('active');
+                    progressBar.classList.remove('step-1');
+                    progressBar.classList.add('step-2');
+                } else {
+                    alert('Please complete all required fields correctly before proceeding.');
+                }
+            });
+            
+            // Back button handler
+            backBtn.addEventListener('click', function() {
+                section2.classList.remove('active');
+                section1.classList.add('active');
+                step2.classList.remove('active');
+                step1.classList.add('active');
+                step1.classList.remove('completed');
+                progressBar.classList.remove('step-2');
+                progressBar.classList.add('step-1');
+            });
+            
+            // Terms agreement handler
+            agreeTerms.addEventListener('change', function() {
+                submitBtn.disabled = !this.checked;
+            });
+            
+            // Form submission
+            kycForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!agreeTerms.checked) {
+                    alert('You must agree to the terms and conditions before submitting.');
+                    return;
+                }
+                
+                // Check if selfie was provided
+                if (!hasSelfie()) {
+                    selfieStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please provide a selfie before submitting';
+                    selfieStatus.className = 'validation-message invalid';
+                    return;
+                }
+                
+                // Simulate form submission
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                
+                setTimeout(function() {
+                    alert('KYC verification submitted successfully! Your application is being processed.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-lock"></i> Submit KYC';
+                }, 2000);
+            });
+            
+            // Check if selfie is provided based on current mode
+            function hasSelfie() {
+                if (currentImageMode === 'selfie') {
+                    return capturedImage !== null;
+                } else {
+                    return uploadedImage !== null;
+                }
+            }
+            
+            // Real-time validation
+            firstNameInput.addEventListener('input', validateName);
+            lastNameInput.addEventListener('input', validateName);
+            emailInput.addEventListener('input', validateEmail);
+            idNumberInput.addEventListener('input', validateIdNumber);
+            
+            function validateName() {
+                const firstName = firstNameInput.value.trim();
+                const lastName = lastNameInput.value.trim();
+                
+                // First name validation
+                if (firstName === '') {
+                    firstNameValidation.textContent = '';
+                } else if (firstName.length < 2) {
+                    firstNameValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> First name is too short';
+                    firstNameValidation.className = 'validation-message invalid';
+                } else if (!/^[a-zA-Z\s\-']+$/.test(firstName)) {
+                    firstNameValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> First name contains invalid characters';
+                    firstNameValidation.className = 'validation-message invalid';
+                } else {
+                    firstNameValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid first name';
+                    firstNameValidation.className = 'validation-message valid';
+                }
+                
+                // Last name validation
+                if (lastName === '') {
+                    lastNameValidation.textContent = '';
+                } else if (lastName.length < 2) {
+                    lastNameValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> Last name is too short';
+                    lastNameValidation.className = 'validation-message invalid';
+                } else if (!/^[a-zA-Z\s\-']+$/.test(lastName)) {
+                    lastNameValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> Last name contains invalid characters';
+                    lastNameValidation.className = 'validation-message invalid';
+                } else {
+                    lastNameValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid last name';
+                    lastNameValidation.className = 'validation-message valid';
+                }
+                
+                // Name matching validation (simulated)
+                if (firstName && lastName) {
+                    // In a real application, this would compare with extracted name from ID
+                    // For demo purposes, we'll use a simple check
+                    if (firstName.length >= 2 && lastName.length >= 2) {
+                        nameMatch.innerHTML = '<i class="fas fa-check-circle"></i> Names appear valid for verification';
+                        nameMatch.className = 'validation-message valid';
+                    } else {
+                        nameMatch.innerHTML = '<i class="fas fa-exclamation-circle"></i> Names may not match ID document';
+                        nameMatch.className = 'validation-message invalid';
+                    }
+                } else {
+                    nameMatch.textContent = '';
+                }
+            }
+            
+            function validateEmail() {
+                const email = emailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (email === '') {
+                    emailValidation.textContent = '';
+                } else if (!emailRegex.test(email)) {
+                    emailValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter a valid email address';
+                    emailValidation.className = 'validation-message invalid';
+                } else {
+                    emailValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid email address';
+                    emailValidation.className = 'validation-message valid';
+                }
+            }
+            
+            function validateIdNumber() {
+                const idType = idTypeSelect.value;
+                const idValue = idNumberInput.value.trim().toUpperCase();
+                
+                if (!idType) {
+                    idValidation.textContent = 'Please select document type first';
+                    idValidation.className = 'validation-message invalid';
+                    return;
+                }
+                
+                if (idValue === '') {
+                    idValidation.textContent = '';
+                    return;
+                }
+                
+                // ID validation patterns for different document types
+                const patterns = {
+                    id_card: /^[0-9]{13}$/,
+                    id_book: /^[0-9]{13}$/,
+                    passport: /^[A-PR-WY][1-9]\d\s?\d{4}[1-9]$/
+                };
+                
+                const pattern = patterns[idType];
+                if (pattern && pattern.test(idValue)) {
+                    idValidation.innerHTML = '<i class="fas fa-check-circle"></i> Valid ID format';
+                    idValidation.className = 'validation-message valid';
+                } else {
+                    idValidation.innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid ID format for selected document type';
+                    idValidation.className = 'validation-message invalid';
+                }
+            }
+            
+            // Validate step 1
+            function validateStep1() {
+                let isValid = true;
+                
+                // Check required fields
+                const requiredFields = [
+                    firstNameInput, lastNameInput, emailInput, idNumberInput
+                ];
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.style.borderColor = 'var(--danger)';
+                    } else {
+                        field.style.borderColor = '#ddd';
+                    }
+                });
+                
+                // Check file uploads
+                const addressProofFile = addressProofInput.files[0];
+                
+                if (!addressProofFile) {
+                    isValid = false;
+                }
+                
+                // Check selfie capture
+                if (!hasSelfie()) {
+                    isValid = false;
+                    selfieStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please provide a selfie before proceeding';
+                    selfieStatus.className = 'validation-message invalid';
+                }
+                
+                // Check document upload based on type
+                const idType = idTypeSelect.value;
+                if (idType === 'id_card') {
+                    const idDocumentFile = document.getElementById('idDocument').files[0];
+                    if (!idDocumentFile) isValid = false;
+                } else if (idType === 'id_book' || idType === 'passport') {
+                    const idDocumentFrontFile = document.getElementById('idDocumentFront').files[0];
+                    const idDocumentBackFile = document.getElementById('idDocumentBack').files[0];
+                    if (!idDocumentFrontFile || !idDocumentBackFile) isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Initialize with some demo values for testing
+            window.fillDemoData = function() {
+                firstNameInput.value = 'Naledi';
+                lastNameInput.value = 'Muhauli';
+                emailInput.value = 'naledi@example.com';
+                idNumberInput.value = '9301234567890';
+                
+                // Trigger validation
+                validateName();
+                validateEmail();
+                validateIdNumber();
+            };
+        });
+    </script>
+</body>
+</html>
