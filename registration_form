@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Money Brain</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            width: 100%;
+            padding: 20px;
+            background-color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-image {
+            height: 30px;
+        }
+
+        .navbar {
+            position: absolute;
+            top: 26px;
+            right: 60px;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar a {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ff6600;
+        }
+
+        .navbar a.active {
+            color: #ff6600;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #333;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ff6600;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Login/Register Container */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 20px 40px;
+            flex: 1;
+        }
+
+        .login-form {
+            background-color: #fff;
+            padding: 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            max-width: 450px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .login-form h4 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #ff6600;
+            outline: none;
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .login-form button:hover {
+            background-color: #e65c00;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider span {
+            padding: 0 15px;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .link a {
+            color: #ff6600;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .social-btn:hover {
+            background-color: #f9f9f9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .social-btn.paypal {
+            color: #003087;
+        }
+
+        .social-btn.google {
+            color: #4285F4;
+        }
+
+        .social-btn i {
+            font-size: 18px;
+        }
+
+        /* Footer Styles */
+        .last-text-fot {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .last-text-fot p {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .last-text-fot a {
+            color: #ff6600;
+            text-decoration: none;
+        }
+
+        .last-text-fot a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                position: static;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 15px;
+            }
+            
+            .login-container {
+                padding: 120px 15px 40px;
+            }
+            
+            .login-form {
+                padding: 30px 25px;
+            }
+            
+            .social-login {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="logo">Money Brain <img src="{% static 'images/craniumLog.png'%}" alt="Logo" class="logo-image"></a>
+
+        <nav class="navbar">
+            <a href="{% url 'eco_info' %}" style="--i:1">Eco Payments</a>
+            <a href="{% url 'payout' %}" style="--i:2">Payout AZA</a>
+            <a href="{% url 'payout_form' %}" style="--i:5">Payout PayPal</a>
+            <a href="#" style="--i:3">Transactions History</a>
+            <a href="{% url 'account_information' %}" style="--i:4">Account</a>
+
+            {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <a href="#" id="user-menu">{{ user.username }}</a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'logout' %}" id="logout-link">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" style="--i:5">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Registration Form -->
+    <section class="login-container">
+        <div class="login-form">
+            <h4>Create Money Brain Account</h4>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" id="password1" name="password1" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" id="password2" name="password2" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+
+            <div class="divider">
+                <span>Or register with</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn google" onclick="handleGoogleSignUp()">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </button>
+                <button class="social-btn paypal" onclick="handlePayPalSignUp()">
+                    <i class="fab fa-paypal"></i>
+                    Continue with PayPal
+                </button>
+            </div>
+
+            <div class="link">
+                <a href="{% url 'login' %}">Already have an account? Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="last-text-fot">
+        <p>Cranium Money Transfer - Secure, Fast, and Reliable Currency Transfers Worldwide.</p>
+        <p>For assistance, contact our support team at <a href="https://cranium-invest.co.za/"><span class="e-span">hello@cranium-invest.co.za </span></a>or call us at +27 75 023 1943. &copy; 2024 Cranium. All rights reserved.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const form = document.querySelector('form');
+            const password1 = document.getElementById('password1');
+            const password2 = document.getElementById('password2');
+            
+            form.addEventListener('submit', function(e) {
+                // Check if passwords match
+                if (password1.value !== password2.value) {
+                    e.preventDefault();
+                    alert('Passwords do not match. Please try again.');
+                    password2.focus();
+                    return false;
+                }
+                
+                // Check password strength
+                if (password1.value.length < 8) {
+                    e.preventDefault();
+                    alert('Password must be at least 8 characters long.');
+                    password1.focus();
+                    return false;
+                }
+                
+                // If all validations pass, form will submit
+                return true;
+            });
+            
+            // Real-time password confirmation
+            password2.addEventListener('input', function() {
+                if (password1.value !== password2.value) {
+                    password2.style.borderColor = '#dc3545';
+                } else {
+                    password2.style.borderColor = '#28a745';
+                }
+            });
+        });
+
+        // Google Sign-Up Handler
+        function handleGoogleSignUp() {
+            // In a real implementation, this would integrate with Google OAuth
+            console.log('Initiating Google sign-up...');
+            
+            // Show loading state
+            const googleBtn = document.querySelector('.social-btn.google');
+            const originalText = googleBtn.innerHTML;
+            googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            googleBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Reset button
+                googleBtn.innerHTML = originalText;
+                googleBtn.disabled = false;
+                
+                // In a real app, this would redirect to Google OAuth
+                // For demo purposes, we'll show a message
+                alert('Google registration would normally redirect to Google OAuth service. This is a frontend demonstration.');
+            }, 1500);
+        }
+
+        // PayPal Sign-Up Handler
+        function handlePayPalSignUp() {
+            // In a real implementation, this would integrate with PayPal OAuth
+            console.log('Initiating PayPal sign-up...');
+            
+            // Show loading state
+            const paypalBtn = document.querySelector('.social-btn.paypal');
+            const originalText = paypalBtn.innerHTML;
+            paypalBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            paypalBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Reset button
+                paypalBtn.innerHTML = originalText;
+                paypalBtn.disabled = false;
+                
+                // In a real app, this would redirect to PayPal OAuth
+                // For demo purposes, we'll show a message
+                alert('PayPal registration would normally redirect to PayPal OAuth service. This is a frontend demonstration.');
+            }, 1500);
+        }
+
+        // Password strength indicator (optional enhancement)
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/)) strength++;
+            if (password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            return strength;
+        }
+    </script>
+</body>
+</html>
